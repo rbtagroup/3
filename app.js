@@ -41,12 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggle = document.getElementById("themeToggle");
   const historyBox = document.getElementById("history");
 
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-    try{renderHistory();}catch(_e){}
-});
-
-  form.addEventListener("submit", e => {
+  // Theme persistence
+  (function(){
+    const key="rbTheme";
+    const saved = localStorage.getItem(key);
+    if (saved === "light") document.body.classList.add("light-mode");
+    updateThemeLabel();
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+      localStorage.setItem(key, document.body.classList.contains("light-mode") ? "light" : "dark");
+      updateThemeLabel();
+      try{renderHistory();}catch(_e){}
+    });
+    function updateThemeLabel(){
+      const light = document.body.classList.contains("light-mode");
+      themeToggle.textContent = light ? "🌞 Světlý režim" : "🌙 Tmavý režim";
+    }
+  })();
+form.addEventListener("submit", e => {
     e.preventDefault();
 
     const driver = getValue("driverName");
@@ -150,6 +162,16 @@ document.addEventListener("DOMContentLoaded", () => {
         await navigator.clipboard.writeText(text);
         alert("Zkopírováno do schránky.");
       } else {
+        const ta = document.createElement("textarea");
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+        alert("Zkopírováno do schránky.");
+      }
+    }catch(e){ alert("Sdílení selhalo: " + e.message); }
+  });} else if (navigator.clipboard){
+        await navigator.clipboard.writeText(text);
+        alert("Zkopírováno do schránky.");
+      } else {
         const w = window.open("", "_blank"); 
         w.document.write("<pre>"+text.replace(/</g,"&lt;")+"</pre>");
         w.document.close();
@@ -178,14 +200,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getNumber(id) {
-    return parseFloat(document.getElementById(id).value) || 0;
+    const raw = document.getElementById(id).value.trim().replace(",", ".");
+    const n = parseFloat(raw);
+    return isNaN(n) ? 0 : n;
   }
 
 
   // Registrace service workeru pro PWA (pokud je podporováno)
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("service-worker.js?v=v9_ultra_20250820192037").catch(console.warn);
-    });
+  if (location.protocol.startsWith("http") && "serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("service-worker.js?v=v10_ultra_fix_20250820194050").catch(console.warn); }); });
   }
 });

@@ -78,3 +78,36 @@ button.secondary{
   input,select,textarea{font-size:16px}
   .form-actions{gap:10px}
 }
+
+/* === v10 THEME ADDITIONS === */
+
+/* === THEME SYSTEM === */
+:root{
+  --bg: var(--bg-grad);
+  --text:#f6f6f6;
+  --muted:#c9c9c9;
+  --card-bg: rgba(255,255,255,.08);
+  --card-border: rgba(255,255,255,.15);
+  --field-bg: rgba(255,255,255,.06);
+  --field-border: rgba(255,255,255,.14);
+}
+body.light-mode{
+  --bg: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+  --text:#1b1b1b;
+  --muted:#555;
+  --card-bg: rgba(0,0,0,.03);
+  --card-border: rgba(0,0,0,.10);
+  --field-bg: rgba(255,255,255,1);
+  --field-border: rgba(0,0,0,.12);
+}
+html,body{color:var(--text)}
+form, #output, #history{background:var(--card-bg); border-color:var(--card-border)}
+input,select,textarea{background:var(--field-bg); border-color:var(--field-border); color:var(--text)}
+#themeToggle{
+  position:absolute; right:12px; top:12px; 
+  padding:8px 12px; border-radius:12px; font-weight:600;
+  cursor:pointer; user-select:none;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
+}
+body.light-mode #themeToggle{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1);}

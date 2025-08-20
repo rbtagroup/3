@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rb-taxi-cache-v4';
+const CACHE_NAME = 'rb-taxi-cache-v5';
 const ASSETS = [
   'index.html',
   'style.css',
