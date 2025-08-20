@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FFD700" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>RB TAXI – Výčetka</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css?v=v9_ultra_20250820192037" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="app.js?v=v9_ultra_20250820192037"></script>
+</head>
+<body>
+  <header>
+    <h1><img src="icon-192.png" alt="RB TAXI" class="brand-icon" /> <span class="brand-title">Výčetka řidiče</span></h1>
+    <div id="themeToggle">🌓 Přepnout režim</div>
+  </header>
+  <main>
+    <form id="calcForm">
+      <label>👤 Řidič: <input type="text" id="driverName" placeholder="Jméno řidiče" required /></label>
+      <label>🕒 Typ směny:
+        <select id="shiftType">
+          <option value="den">Denní</option>
+          <option value="noc">Noční</option>
+          <option value="odpo">Odpolední</option>
+          <option value="pul">1/2 směna</option>
+        </select>
+      </label>
+      <label>🚗 Kilometry: <input type="number" id="km" required /></label>
+      <label>💰 Tržba: <input type="number" id="trzba" required /></label>
+      <label>🏁 Přístavné: <input type="number" id="pristavne" /></label>
+      <label>⛽ Palivo: <input type="number" id="palivo" /></label>
+      <label>🧽 Mytí: <input type="number" id="myti" /></label>
+      <label>💳 Kartou: <input type="number" id="kartou" /></label>
+      <label>🧾 Fakturou: <input type="number" id="fakturou" /></label>
+      <label>📦 Jiné: <input type="number" id="jine" /></label>
+
+      <div class="form-actions">
+        <button type="submit">📊 Vypočítat</button>
+        <button type="button" id="resetBtn">🔄 Reset</button>
+        
+      </div>
+    </form>
+
+    <section id="output" class="hidden"></section>
+    <div id="actions" class="hidden">
+      <button type="button" id="pdfExport">📄 Export do PDF</button>
+      <button type="button" id="shareBtn">📌 Sdílet</button>
+      <button type="button" id="newShiftBtn">🔁 Nová směna</button>
+    </div>
+    <section id="history" class="hidden"><h3 style="margin:8px 0 4px;">📚 Historie (posledních 10)</h3><div id="historyList"></div></section>
+  
+    <footer id="appVersion" style="text-align:center;color:#9aa0a6;margin:10px 0;font-size:12px;">RB TAXI Mobile v9_ultra_20250820192037</footer>
+</main>
+</body>
+</html>
