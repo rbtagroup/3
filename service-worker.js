@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rb-taxi-cache-v12_svg_icons_20250821102256';
+const CACHE_NAME = 'rb-taxi-cache-v13_hardfix_20250821103429';
 const ASSETS = [
   'index.html',
   'style.css',
