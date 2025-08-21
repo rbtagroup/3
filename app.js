@@ -55,7 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     function updateThemeLabel(){
       const light = document.body.classList.contains("light-mode");
-      themeToggle.textContent = light ? "🌞 Světlý režim" : "🌙 Tmavý režim";
+      const ico = light ? '#icon-sun' : '#icon-moon';
+      const label = light ? 'Světlý režim' : 'Tmavý režim';
+      const el = document.getElementById("themeToggle");
+      if (el){
+        el.innerHTML = '<svg class="icon"><use href="'+ico+'"/></svg> ' + label;
+      }
     }
   })();
 form.addEventListener("submit", e => {
@@ -93,24 +98,24 @@ form.addEventListener("submit", e => {
     const datum = new Date().toLocaleString("cs-CZ");
 
     const html = `
-      <div class="title">📄 Výčetka řidiče</div>
-      <div class="row"><div class="key">📅 Datum:</div><div class="val">${datum}</div></div>
-      <div class="row"><div class="key">👤 Řidič:</div><div class="val">${driver}</div></div>
-      <div class="row"><div class="key">🕒 Směna:</div><div class="val">${shiftLabel}</div></div>
+      <div class="title"><svg class="icon"><use href="#icon-doc"/></svg> Výčetka řidiče</div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Datum:</div><div class="val">${datum}</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-user"/></svg></span> Řidič:</div><div class="val">${driver}</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Směna:</div><div class="val">${shiftLabel}</div></div>
       <div class="hr"></div>
-      <div class="row"><div class="key">💰 Tržba:</div><div class="val">${trzba} Kč</div></div>
-      <div class="row"><div class="key">⛽ Palivo:</div><div class="val">${palivo} Kč</div></div>
-      <div class="row"><div class="key">🚗 Mytí:</div><div class="val">${myti} Kč</div></div>
-      <div class="row"><div class="key">💳 Kartou:</div><div class="val">${kartou} Kč</div></div>
-      <div class="row"><div class="key">🧾 Faktura:</div><div class="val">${fakturou} Kč</div></div>
-      <div class="row"><div class="key">📍 Přístavné:</div><div class="val">${pristavne} Kč</div></div>
-      <div class="row"><div class="key">💸 Jiné platby:</div><div class="val">${jine} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Tržba:</div><div class="val">${trzba} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-fuel"/></svg></span> Palivo:</div><div class="val">${palivo} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-wash"/></svg></span> Mytí:</div><div class="val">${myti} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-card"/></svg></span> Kartou:</div><div class="val">${kartou} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-doc"/></svg></span> Faktura:</div><div class="val">${fakturou} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Přístavné:</div><div class="val">${pristavne} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> Jiné platby:</div><div class="val">${jine} Kč</div></div>
       <div class="hr"></div>
-      <div class="row"><div class="key">📦 K odevzdání:</div><div class="val money-blue">${kOdevzdani.toFixed(2)} Kč</div></div>
-      <div class="row"><div class="key">💼 Výplata řidiče:</div><div class="val money-green">${vyplata.toFixed(2)} Kč</div></div>
-      ${nedoplatek ? `<div class="row"><div class="key">❗ Doplatek do minima:</div><div class="val money-red">${doplatek.toFixed(2)} Kč</div></div>` : ``}
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> K odevzdání:</div><div class="val money-blue">${kOdevzdani.toFixed(2)} Kč</div></div>
+      <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Výplata řidiče:</div><div class="val money-green">${vyplata.toFixed(2)} Kč</div></div>
+      ${nedoplatek ? `<div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Doplatek do minima:</div><div class="val money-red">${doplatek.toFixed(2)} Kč</div></div>` : ``}
       <div class="note">
-        <label for="note"><strong>📝 Poznámka ke směně:</strong></label>
+        <label for="note"><strong><span class="ico"><svg class="icon"><use href="#icon-doc"/></svg></span> Poznámka ke směně:</strong></label>
         <textarea id="note" rows="3" placeholder="Volitelná poznámka..."></textarea>
       </div>
     `;

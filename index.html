@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>RB TAXI – Výčetka</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=v10_ultra_fix_20250820194050?v=v9_ultra_20250820192037" />
+  <link rel="stylesheet" href="style.css?v=v12_svg_icons_20250821102256?v=v10_ultra_fix_20250820194050?v=v9_ultra_20250820192037" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
@@ -17,14 +17,67 @@
   <script defer src="app.js?v=v10_ultra_fix_20250820194050?v=v9_ultra_20250820192037"></script>
 </head>
 <body>
+
+<!-- SVG ICON SPRITE -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" />
+  </symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>
+  </symbol>
+  <symbol id="icon-road" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20l6-16 4 16 6-16" /><path d="M12 4v4m0 4v4m0 4v0"/>
+  </symbol>
+  <symbol id="icon-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+  </symbol>
+  <symbol id="icon-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 22V4h8l1 3h7v9h-9l-1-3H4z"/>
+  </symbol>
+  <symbol id="icon-fuel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="6" width="10" height="14" rx="2"/><path d="M14 9l4-2v7a3 3 0 1 0 6 0V9l-2-2-2 1" transform="translate(-4 0)"/>
+  </symbol>
+  <symbol id="icon-wash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3c-1.5 2-5 6-5 9a5 5 0 0 0 10 0c0-3-3.5-7-5-9z"/>
+  </symbol>
+  <symbol id="icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
+  </symbol>
+  <symbol id="icon-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>
+  </symbol>
+  <symbol id="icon-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/><path d="M3.5 7.5l9 5 9-5"/>
+  </symbol>
+  <symbol id="icon-calc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h3"/>
+  </symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 12a9 9 0 0 1 15-6l2 2M21 12a9 9 0 0 1-15 6l-2-2"/><path d="M21 4v6h-6"/>
+  </symbol>
+  <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.7 13.4l6.6 3.2M15.3 7.4L8.7 10.6"/>
+  </symbol>
+  <symbol id="icon-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 1l4 4-4 4M3 11V9a6 6 0 0 1 6-6h12"/><path d="M7 23l-4-4 4-4M21 13v2a6 6 0 0 1-6 6H3"/>
+  </symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+  </symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </symbol>
+</svg>
+
   <header>
     <h1><img src="icon-192.png" alt="RB TAXI" class="brand-icon" /> <span class="brand-title">Výčetka řidiče</span></h1>
-    <div id="themeToggle">🌓 Přepnout režim</div>
+    <div id="themeToggle"><span class="ico"><svg class="icon"><use href="#icon-moon"/></svg></span> Přepnout režim</div>
   </header>
   <main>
     <form id="calcForm">
-      <label>👤 Řidič: <input type="text" id="driverName" placeholder="Jméno řidiče" required /></label>
-      <label>🕒 Typ směny:
+      <label><span class="ico"><svg class="icon"><use href="#icon-user"/></svg></span> Řidič: <input type="text" id="driverName" placeholder="Jméno řidiče" required /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Typ směny:
         <select id="shiftType">
           <option value="den">Denní</option>
           <option value="noc">Noční</option>
@@ -32,27 +85,27 @@
           <option value="pul">1/2 směna</option>
         </select>
       </label>
-      <label>🚗 Kilometry: <input type="number" id="km" required /></label>
-      <label>💰 Tržba: <input type="number" id="trzba" required /></label>
-      <label>🏁 Přístavné: <input type="number" id="pristavne" /></label>
-      <label>⛽ Palivo: <input type="number" id="palivo" /></label>
-      <label>🧽 Mytí: <input type="number" id="myti" /></label>
-      <label>💳 Kartou: <input type="number" id="kartou" /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-road"/></svg></span> Kilometry: <input type="number" id="km" required /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Tržba: <input type="number" id="trzba" required /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Přístavné: <input type="number" id="pristavne" /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-fuel"/></svg></span> Palivo: <input type="number" id="palivo" /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-wash"/></svg></span> Mytí: <input type="number" id="myti" /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-card"/></svg></span> Kartou: <input type="number" id="kartou" /></label>
       <label>🧾 Fakturou: <input type="number" id="fakturou" /></label>
-      <label>📦 Jiné: <input type="number" id="jine" /></label>
+      <label><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> Jiné: <input type="number" id="jine" /></label>
 
       <div class="form-actions">
-        <button type="submit">📊 Vypočítat</button>
-        <button type="button" id="resetBtn">🔄 Reset</button>
+        <button type="submit"><svg class="icon"><use href="#icon-calc"/></svg> Vypočítat</button>
+        <button type="button" id="resetBtn"><svg class="icon"><use href="#icon-refresh"/></svg> Reset</button>
         
       </div>
     </form>
 
     <section id="output" class="hidden"></section>
     <div id="actions" class="hidden">
-      <button type="button" id="pdfExport">📄 Export do PDF</button>
-      <button type="button" id="shareBtn">📌 Sdílet</button>
-      <button type="button" id="newShiftBtn">🔁 Nová směna</button>
+      <button type="button" id="pdfExport"><svg class="icon"><use href="#icon-doc"/></svg> Export do PDF</button>
+      <button type="button" id="shareBtn"><svg class="icon"><use href="#icon-share"/></svg> Sdílet</button>
+      <button type="button" id="newShiftBtn"><svg class="icon"><use href="#icon-repeat"/></svg> Nová směna</button>
     </div>
     <section id="history" class="hidden"><h3 style="margin:8px 0 4px;">📚 Historie (posledních 10)</h3><div id="historyList"></div></section>
   

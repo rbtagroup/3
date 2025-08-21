@@ -111,3 +111,23 @@ input,select,textarea{background:var(--field-bg); border-color:var(--field-borde
   backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
 }
 body.light-mode #themeToggle{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1);}
+
+
+/* === THEME CLEAN FIX v11_pro_clean_20250821101652 === */
+:root{ --bg: var(--bg-grad); --text:#f6f6f6; }
+body.light-mode{ --bg: linear-gradient(180deg,#fafafa 0%,#f0f0f0 100%); --text:#1b1b1b; }
+html, body{ background: var(--bg) !important; color: var(--text) !important; }
+label, .row .key, .row .val, header h1, #history, #history *{ color: var(--text) !important; }
+
+/* === SVG ICONS v12_svg_icons_20250821102256 === */
+.icon{
+  width: 18px; height: 18px;
+  display: inline-block;
+  vertical-align: -3px;
+  stroke: currentColor;
+  fill: none;
+}
+label .ico, #output .key .ico {
+  margin-right: 6px;
+}
+button .icon{ margin-right:8px; }
