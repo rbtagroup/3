@@ -12,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("calcForm");
   const output = document.getElementById("output");
   const actions = document.getElementById("actions");
-  const historyBox = document.getElementById("history");
-  const historyList = document.getElementById("historyList") || (historyBox && historyBox.querySelector("#historyList"));
-
+    
   const resetBtn = document.getElementById("resetBtn");
   const pdfBtn = document.getElementById("pdfExport");
   const shareBtn = document.getElementById("shareBtn");
@@ -51,8 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.toggle("light-mode");
         localStorage.setItem(key, document.body.classList.contains("light-mode") ? "light" : "dark");
         updateThemeLabel();
-        try{ renderHistory(); }catch(_e){}
-      });
+        });
     }
   })();
 
@@ -65,33 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // === HISTORY ===
-  const HISTORY_KEY = "rbTaxiHistory";
-  function pushHistory(entry) {
-    try {
-      const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-      arr.unshift(entry);
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,10)));
-    } catch(_e){}
-  }
-  function renderHistory() {
-    if (!historyBox || !historyList) return;
-    const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    if (!arr.length) { historyBox.classList.add("hidden"); return; }
-    const shiftMap = { "den":"Denní","noc":"Noční","odpo":"Odpolední","pul":"1/2 směna" };
-    const rows = arr.map(e => `
-      <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.15)">
-        <div style="flex:1;min-width:0">
-          <div style="font-weight:700">${e.datum} – ${e.driver} (${shiftMap[e.shift] || e.shift})</div>
-          <div style="opacity:.85">Tržba ${e.trzba} Kč • K odevzdání ${e.kOdevzdani.toFixed(2)} Kč • Výplata ${e.vyplata.toFixed(2)} Kč</div>
-        </div>
-        <button type="button" class="secondary" onclick="navigator.clipboard && navigator.clipboard.writeText(this.previousElementSibling.innerText).catch(()=>{})">Kopírovat</button>
-      </div>
-    `).join("");
-    historyList.innerHTML = rows;
-    historyBox.classList.remove("hidden");
-  }
-  try { renderHistory(); } catch(_e){}
-
+  
+  let lastData = null;
   // === SUBMIT ===
   if (form) {
     form.addEventListener("submit", (e) => {
@@ -122,6 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const kOdevzdani = trzba - palivo - myti - kartou - fakturou - jine;
 
       const datum = new Date().toLocaleString("cs-CZ");
+      const kcPerKm = km>0 ? (trzba/km) : 0;
+      const podilBezhotovost = trzba>0 ? ((kartou+fakturou)/trzba)*100 : 0;
+      const rozdilVsMinimum = trzba - minTrzba;
+      const rezimVyplaty = (netto > (isHalf ? THRESHOLD_HALF : THRESHOLD_FULL)) ? "% z netto" : (isHalf ? "Fix 1/2 směna" : "Fix plná směna");
+      lastData = { datum, driver, shiftLabel, km, trzba, pristavne, palivo, myti, kartou, fakturou, jine, netto, minTrzba, doplatek, nedoplatek, vyplata, kOdevzdani, kcPerKm, podilBezhotovost, rezimVyplaty, rozdilVsMinimum };
       const html = `
         <div class="title"><svg class="icon"><use href="#icon-doc"/></svg> Výčetka řidiče</div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Datum:</div><div class="val">${datum}</div></div>
@@ -157,11 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
       output.classList.remove("hidden");
       if (actions) actions.classList.remove("hidden");
 
-      try {
-        pushHistory({driver, shift, km, trzba, pristavne, palivo, myti, kartou, fakturou, jine, kOdevzdani, vyplata, datum});
-        renderHistory();
-      } catch(_e){}
-    });
+          });
   }
 
   // === BUTTONS ===
