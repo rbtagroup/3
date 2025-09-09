@@ -1,5 +1,8 @@
 
 document.addEventListener("DOMContentLoaded", () => {
+  // history neutralized
+  const pushHistory = (..._args) => {};
+  const renderHistory = (..._args) => {};
   // === CONFIG ===
   const COMMISSION_RATE = 0.30;        // 30 % z netto tržby
   const BASE_FULL_SHIFT = 1000;        // fix pro plnou směnu
@@ -11,68 +14,42 @@ document.addEventListener("DOMContentLoaded", () => {
   // === ELEMENTS ===
   const form = document.getElementById("calcForm");
   const output = document.getElementById("output");
+  // === IAC Logger ===
+  const IAC_RIDES_KEY = "IAC_RIDES_V1";
+  function loadIacRides(){ try{ return JSON.parse(localStorage.getItem(IAC_RIDES_KEY) || "[]").filter(n => Number(n) > 0); }catch(_e){ return []; } }
+  function saveIacRides(arr){ try{ localStorage.setItem(IAC_RIDES_KEY, JSON.stringify(arr||[])); }catch(_e){} }
+  function iacTotals(){ const arr = loadIacRides(); const total = arr.reduce((a,b)=>a+Number(b||0),0); return {count: arr.length, totalKm: total}; }
+  function updateIacUI(){ const t=iacTotals(); const c=document.getElementById("iacCount"); const k=document.getElementById("iacKmTotal"); if(c) c.value= t.count? String(t.count) : ""; if(k) k.value = t.totalKm? String(Math.round((t.totalKm+Number.EPSILON)*100)/100) : ""; }
+  function bindIacButtons(){ const add=document.getElementById("iacAdd"); const undo=document.getElementById("iacUndo"); const clear=document.getElementById("iacClear");
+    add && add.addEventListener("click", ()=>{ const v=prompt("Kolik km měla tato IAC jízda?"); if(v==null) return; const n=parseFloat(String(v).replace(",",".")); if(!isFinite(n)||n<=0){ alert("Zadej kladné číslo km."); return;} const arr=loadIacRides(); arr.push(n); saveIacRides(arr); updateIacUI(); });
+    undo && undo.addEventListener("click", ()=>{ const arr=loadIacRides(); arr.pop(); saveIacRides(arr); updateIacUI(); });
+    clear && clear.addEventListener("click", ()=>{ if(!confirm("Vymazat všechny IAC jízdy?")) return; saveIacRides([]); updateIacUI(); });
+  }
+  updateIacUI(); bindIacButtons();
   const actions = document.getElementById("actions");
-    
+  const historyBox = document.getElementById("history");
+  const historyList = document.getElementById("historyList") || (historyBox && historyBox.querySelector("#historyList"));
+
   const resetBtn = document.getElementById("resetBtn");
   const pdfBtn = document.getElementById("pdfExport");
   const shareBtn = document.getElementById("shareBtn");
   const newShiftBtn = document.getElementById("newShiftBtn");
   const themeToggle = document.getElementById("themeToggle");
 
-  // === HELPERS ===
-  function getValue(id) {
-    const el = document.getElementById(id);
-    return el ? (el.value || "").trim() : "";
-  }
-  function getNumber(id) {
-    const el = document.getElementById(id);
-    if (!el) return 0;
-    const raw = (el.value || "").trim().replace(",", ".");
-    const n = parseFloat(raw);
-    return isNaN(n) ? 0 : n;
-  }
-
-  // === THEME (persist + system default) ===
-  (function initTheme(){
-    const key = "rbTheme";
-    let saved = localStorage.getItem(key);
-    if (!saved) {
-      try {
-        saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
-      } catch (_e) { saved = 'dark'; }
-      localStorage.setItem(key, saved);
-    }
-    if (saved === "light") document.body.classList.add("light-mode");
-    updateThemeLabel();
-    if (themeToggle) {
-      themeToggle.addEventListener("click", () => {
-        document.body.classList.toggle("light-mode");
-        localStorage.setItem(key, document.body.classList.contains("light-mode") ? "light" : "dark");
-        updateThemeLabel();
-        });
-    }
-  })();
-
-  function updateThemeLabel(){
-    const light = document.body.classList.contains("light-mode");
-    const ico = light ? '#icon-sun' : '#icon-moon';
-    const label = light ? 'Světlý režim' : 'Tmavý režim';
-    const el = document.getElementById("themeToggle");
-    if (el) el.innerHTML = '<svg class="icon"><use href="'+ico+'"/></svg> ' + label;
-  }
-
-  // === HISTORY ===
   
-  let lastData = null;
-  // === SUBMIT ===
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const driver = getValue("driverName");
-      const shift = getValue("shiftType");
-      const shiftLabelMap = { den: "Denní", noc: "Noční", odpo: "Odpolední", pul: "1/2 směna" };
-      const shiftLabel = shiftLabelMap[shift] || shift;
-      const km = getNumber("km");
+  // === AUTO KM CALC ===
+  const kmStart = getNumber("kmStart");
+      const kmEnd = Math.max(kmStart, getNumber("kmEnd"));
+      const kmReal = Math.max(0, kmEnd - kmStart);
+      const _iac = iacTotals();
+      const iacKmTotal = _iac.totalKm;
+      const iacCount = _iac.count;
+      const shkmCount = getNumber("shkmCount");
+      const shkmFlat = !!document.getElementById("shkmFlat")?.checked;
+      const shkmKmForInvoice = shkmFlat ? 0 : (Math.max(0, Math.trunc(shkmCount)) * 7);
+      const invoiceKm = (iacKmTotal || 0) + shkmKmForInvoice;
+      const km = Math.max(0, kmReal - invoiceKm);
+      const rz = getValue("rz");
       const trzba = getNumber("trzba");
       const pristavne = getNumber("pristavne");
       const palivo = getNumber("palivo");
@@ -91,56 +68,128 @@ document.addEventListener("DOMContentLoaded", () => {
       let vyplata = (netto > threshold) ? (netto * COMMISSION_RATE) : (isHalf ? BASE_HALF_SHIFT : BASE_FULL_SHIFT);
       vyplata = Math.round(vyplata * 100) / 100;
 
-      const kOdevzdani = trzba - palivo - myti - kartou - fakturou - jine;
-
+      const kOdevzdani = (trzba - palivo - myti - kartou - fakturou - jine - vyplata);
+// kOdevzdani set after vyplata
       const datum = new Date().toLocaleString("cs-CZ");
-      const kcPerKm = km>0 ? (trzba/km) : 0;
-      const podilBezhotovost = trzba>0 ? ((kartou+fakturou)/trzba)*100 : 0;
-      const rozdilVsMinimum = trzba - minTrzba;
-      const rezimVyplaty = (netto > (isHalf ? THRESHOLD_HALF : THRESHOLD_FULL)) ? "% z netto" : (isHalf ? "Fix 1/2 směna" : "Fix plná směna");
-      lastData = { datum, driver, shiftLabel, km, trzba, pristavne, palivo, myti, kartou, fakturou, jine, netto, minTrzba, doplatek, nedoplatek, vyplata, kOdevzdani, kcPerKm, podilBezhotovost, rezimVyplaty, rozdilVsMinimum };
+      
+      const shkmInfo = (!!document.getElementById("shkmFlat")?.checked) ? `SHKM ${shkmCount}×` : `SHKM ${shkmCount}× (${Math.max(0, Math.trunc(shkmCount)) * 7} km)`;
       const html = `
         <div class="title"><svg class="icon"><use href="#icon-doc"/></svg> Výčetka řidiče</div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Datum:</div><div class="val">${datum}</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-user"/></svg></span> Řidič:</div><div class="val">${driver}</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Směna:</div><div class="val">${shiftLabel}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Směna:</div><div class="val">${shiftLabel}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-car"/></svg></span> RZ:</div><div class="val">${rz || "-"}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Km začátek:</div><div class="val">${kmStart}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Km konec:</div><div class="val">${kmEnd}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-road"/></svg></span> Najeté km:</div><div class="val">${km}</div></div>
         <div class="hr"></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-road"/></svg></span> Kč / km:</div><div class="val">${(km>0 ? (trzba/km).toFixed(2) : "0.00")} Kč/km</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Netto (tržba − přístavné):</div><div class="val">${netto.toFixed(2)} Kč</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Minimum dle KM:</div><div class="val">${minTrzba.toFixed(2)} Kč</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Rozdíl vs. minimum:</div><div class="val">${(trzba - minTrzba).toFixed(2)} Kč</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-card"/></svg></span> Podíl bezhotovost (kartou+faktura):</div><div class="val">${(trzba>0 ? (((kartou+fakturou)/trzba)*100).toFixed(1) : "0.0")} %</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-doc"/></svg></span> Režim výplaty:</div><div class="val">${(netto > (shift==="pul" ? THRESHOLD_HALF : THRESHOLD_FULL)) ? "% z netto" : (shift==="pul" ? "Fix 1/2 směna" : "Fix plná směna")}</div></div>
+        <div class="row"><div class="key">Najaté km (auto):</div><div class="val">${kmReal}</div></div>
+        <div class="row"><div class="key">Účtované km:</div><div class="val">${km}</div></div>
+        <div class="row"><div class="key">Smluvní jízdy:</div><div class="val">IAC ${iacCount}× (${iacKmTotal} km), ${shkmInfo}</div></div>
+        <div class="row"><div class="key">KM smluvní:</div><div class="val">${invoiceKm}</div></div>
         <div class="hr"></div>
-    
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Tržba:</div><div class="val">${trzba} Kč</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-fuel"/></svg></span> Palivo:</div><div class="val">${palivo} Kč</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-wash"/></svg></span> Mytí:</div><div class="val">${myti} Kč</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-card"/></svg></span> Kartou:</div><div class="val">${kartou} Kč</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-doc"/></svg></span> Faktura:</div><div class="val">${fakturou} Kč</div></div>
         <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Přístavné:</div><div class="val">${pristavne} Kč</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> Jiné platby:</div><div class="val">${jine} Kč</div></div>
         <div class="hr"></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> K odevzdání:</div><div class="val money-blue">${kOdevzdani.toFixed(2)} Kč</div></div>
-        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Výplata řidiče:</div><div class="val money-green">${vyplata.toFixed(2)} Kč</div></div>
-        ${nedoplatek ? `<div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Doplatek řidiče na KM:</div><div class="val money-red">${doplatek.toFixed(2)} Kč</div></div>` : ``}
-        <div class="note">
-          <label for="note"><span class="ico"><svg class="icon"><use href="#icon-doc"/></svg></span> <strong>Poznámka ke směně:</strong></label>
-          <textarea id="note" rows="3" placeholder="Volitelná poznámka..."></textarea>
-        </div>
+        <div class="row"><div class="key">K odevzdání:</div><div class="val money-blue">${kOdevzdani.toFixed(2)} Kč</div></div>
+        <div class="row"><div class="key">Výplata:</div><div class="val money-green">${vyplata.toFixed(2)} Kč</div></div>
+        ${nedoplatek ? `<div class="row"><div class="key">Doplatek řidiče na KM</div><div class="val money-red">${doplatek.toFixed(2)} Kč</div></div>
+        <div class="row"><div class="key">K odevzdání celkem (s doplatkem)</div><div class="val money-blue">${(kOdevzdani + doplatek).toFixed(2)} Kč</div></div>` : ``}
       `;
+// Inject RZ + KM rows right after the title
+      try {
+        const hdr = `<div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-car"/></svg></span> RZ:</div><div class="val">${rz || "-"}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-road"/></svg></span> Najeté km:</div><div class="val">${km}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Km začátek:</div><div class="val">${kmStart}</div></div>
+        <div class="row"><div class="key"><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Km konec:</div><div class="val">${kmEnd}</div></div>
+        <div class="hr"></div>`;
+        html = html.replace('Výčetka řidiče</div>', 'Výčetka řidiče</div>' + hdr);
+      } catch(_e) {}
 
       output.innerHTML = html;
+// Add accent classes to key rows based on their label text
+try {
+  output.querySelectorAll('.row .key').forEach(k => {
+    const t = (k.textContent || '').trim();
+    if (t.startsWith('K odevzdání')) k.parentElement?.classList.add('accent-odev');
+    if (t.startsWith('Výplata')) k.parentElement?.classList.add('accent-pay');
+    if (t.startsWith('Doplatek řidiče na KM')) k.parentElement?.classList.add('accent-doplatek');
+    if (t.startsWith('K odevzdání celkem')) k.parentElement?.classList.add('accent-grand');
+  });
+} catch(_e) {}
+
       output.classList.remove("hidden");
       if (actions) actions.classList.remove("hidden");
 
-          });
+      try {
+        pushHistory({driver, shift, km, trzba, pristavne, palivo, myti, kartou, fakturou, jine, kOdevzdani, vyplata, datum});
+        renderHistory();
+      } catch(_e){}
+    });
   }
 
   // === BUTTONS ===
+
+// === SHARE AS IMAGE (non-blocking) ===
+(function(){
+  const btn = document.getElementById('shareImgBtn');
+  const output = document.getElementById('output') || document.querySelector('.output') || document.body;
+  if (!btn || !output) return;
+  btn.addEventListener('click', async () => {
+    try {
+      // ensure visible and up to date before capture
+      if (typeof computeAndRender === 'function') { try { computeAndRender(); } catch(_e){} }
+      const scale = Math.max(2, Math.floor(window.devicePixelRatio || 2));
+      const canvas = await html2canvas(output, { scale, backgroundColor: null, useCORS: true });
+      await new Promise((resolve, reject) => {
+        canvas.toBlob(async (blob) => {
+          try {
+            if (!blob) return reject(new Error("Nepodařilo se vytvořit obrázek."));
+            const file = new File([blob], "vypocet-vycetky.png", { type: "image/png" });
+
+            // 1) Native share with file (https / supported UA)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: "Výčetka řidiče", text: "Výčetka řidiče (PNG)" });
+              return resolve();
+            }
+
+            // 2) Clipboard as image (some Chromium builds)
+            if (navigator.clipboard && window.ClipboardItem) {
+              try {
+                await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                alert("Obrázek výčetky byl zkopírován do schránky.");
+                return resolve();
+              } catch(_e) {}
+            }
+
+            // 3) Download fallback
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "vypocet-vycetky.png";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            resolve();
+          } catch(err) {
+            reject(err);
+          }
+        }, "image/png");
+      });
+    } catch (e) {
+      alert("Sdílení obrázku selhalo: " + (e && e.message ? e.message : e));
+    }
+  });
+})();
+
   if (resetBtn) resetBtn.addEventListener("click", () => {
     const keepName = document.getElementById("driverName")?.value || "";
-    form?.reset();
+    form?.reset(); try{ localStorage.removeItem("IAC_RIDES_V1"); }catch(_e){} updateIacUI();
     if (keepName) document.getElementById("driverName").value = keepName;
     output?.classList.add("hidden");
     actions?.classList.add("hidden");
@@ -148,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (newShiftBtn) newShiftBtn.addEventListener("click", () => {
     const keepName = document.getElementById("driverName")?.value || "";
-    form?.reset();
+    form?.reset(); try{ localStorage.removeItem("IAC_RIDES_V1"); }catch(_e){} updateIacUI();
     if (keepName) document.getElementById("driverName").value = keepName;
     const note = document.getElementById("note");
     if (note) note.value = "";

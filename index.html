@@ -8,13 +8,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>RB TAXI – Výčetka</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=v15_no_history_report_20250821111546?v=v14_modern_font_metrics_20250821104938?v=v13_hardfix_20250821103429?v=v12_svg_icons_20250821102256?v=v10_ultra_fix_20250820194050?v=v9_ultra_20250820192037" />
+  <link rel="stylesheet" href="style.css?v=v14_20250829" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="app.js?v=v15_no_history_report_20250821111546?v=v14_modern_font_metrics_20250821104938?v=v13_hardfix_20250821103429?v=v10_ultra_fix_20250820194050?v=v9_ultra_20250820192037"></script>
+  
 </head>
 <body>
 
@@ -72,12 +72,12 @@
 
   <header>
     <h1><img src="icon-192.png" alt="RB TAXI" class="brand-icon" /> <span class="brand-title">Výčetka řidiče</span></h1>
-    <div id="themeToggle"><span class="ico"><svg class="icon"><use href="#icon-moon"/></svg></span> Přepnout režim</div>
+    <div id="themeToggle"><span class="ico">🌙</span> Tmavý režim</div>
   </header>
   <main>
     <form id="calcForm">
-      <label><span class="ico"><svg class="icon"><use href="#icon-user"/></svg></span> Řidič: <input type="text" id="driverName" placeholder="Jméno řidiče" required /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-clock"/></svg></span> Typ směny:
+      <label><span class="ico">👤</span> Řidič: <input type="text" id="driverName" placeholder="Jméno řidiče" required /></label>
+      <label><span class="ico">⏱️</span> Typ směny:
         <select id="shiftType">
           <option value="den">Denní</option>
           <option value="noc">Noční</option>
@@ -85,31 +85,73 @@
           <option value="pul">1/2 směna</option>
         </select>
       </label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-road"/></svg></span> Kilometry: <input type="number" id="km" required /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-cash"/></svg></span> Tržba: <input type="number" id="trzba" required /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-flag"/></svg></span> Přístavné: <input type="number" id="pristavne" /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-fuel"/></svg></span> Palivo: <input type="number" id="palivo" /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-wash"/></svg></span> Mytí: <input type="number" id="myti" /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-card"/></svg></span> Kartou: <input type="number" id="kartou" /></label>
+      <label><span class="ico">✨</span> RZ vozidla:
+        <select id="rz">
+          <option value="">— vyberte RZ —</option>
+          <option>1BU0299</option>
+          <option>1BU0060</option>
+          <option>2BT6881</option>
+          <option>2BT1565</option>
+          <option>2BY5398</option>
+          <option>2BL8995</option>
+          <option>3BD6003</option>
+        </select>
+      </label>
+      <label><span class="ico">🏁</span> Počáteční km:
+        <input type="number" id="kmStart" inputmode="numeric" />
+      </label>
+      <label><span class="ico">🏁</span> Konečné km:
+        <input type="number" id="kmEnd" inputmode="numeric" />
+      </label>
+      <label><span class="ico">🛣️</span> Najeté km (auto):
+        <input type="number" id="kmReal" readonly />
+      </label>
+      <label><span class="ico">💰</span> Tržba: <input type="number" id="trzba" required /></label>
+      <label><span class="ico">🏁</span> Přístavné: <input type="number" id="pristavne" /></label>
+      <label><span class="ico">⛽</span> Palivo: <input type="number" id="palivo" /></label>
+      <label><span class="ico">🧼</span> Mytí: <input type="number" id="myti" /></label>
+      <label><span class="ico">💳</span> Kartou: <input type="number" id="kartou" /></label>
       <label>🧾 Fakturou: <input type="number" id="fakturou" /></label>
-      <label><span class="ico"><svg class="icon"><use href="#icon-box"/></svg></span> Jiné: <input type="number" id="jine" /></label>
+      <label><span class="ico">🧾</span> Jiné: <input type="number" id="jine" /></label>
+
+      
+      <label><span class="ico">🏷️</span> IAC (počet jízd):
+        <input type="number" id="iacCount" inputmode="decimal" readonly />
+      </label>
+      <label><span class="ico">📏</span> IAC (km celkem):
+        <input type="number" id="iacKmTotal" inputmode="decimal" readonly />
+      </label>
+      <div class="iac-actions">
+        <button type="button" id="iacAdd">+ IAC jízda</button>
+        <button type="button" id="iacUndo">Zpět</button>
+        <button type="button" id="iacClear">Vymazat IAC</button>
+      </div>
+      <label><span class="ico">🏷️</span> SHKM (počet jízd):
+        <input type="number" id="shkmCount" inputmode="numeric" />
+      </label>
+      <div class="field-note">
+        <label style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+          <input type="checkbox" id="shkmFlat" checked />
+          <span>SHKM paušál 100 Kč/jízda (nezapočítávat km)</span>
+        </label>
+      </div>
 
       <div class="form-actions">
-        <button type="submit"><svg class="icon"><use href="#icon-calc"/></svg> Vypočítat</button>
-        <button type="button" id="resetBtn"><svg class="icon"><use href="#icon-refresh"/></svg> Reset</button>
+        <button type="submit"><span class="ico">🧮</span> Vypočítat</button>
+        <button type="button" id="resetBtn"><span class="ico">🔄</span> Reset</button>
         
       </div>
     </form>
 
     <section id="output" class="hidden"></section>
     <div id="actions" class="hidden">
-      <button type="button" id="pdfExport"><svg class="icon"><use href="#icon-doc"/></svg> Export do PDF</button>
-      <button type="button" id="shareBtn"><svg class="icon"><use href="#icon-share"/></svg> Sdílet</button>
-      <button type="button" id="newShiftBtn"><svg class="icon"><use href="#icon-repeat"/></svg> Nová směna</button>
-    </div>
+      <button type="button" id="newShiftBtn"><span class="ico">🔁</span> Nová směna</button>
     
+        <button type="button" id="shareImgBtn" title="Sdílet výčetku">Sdílet výčetku</button></div>
   
     <footer id="appVersion" style="text-align:center;color:#9aa0a6;margin:10px 0;font-size:12px;">RB TAXI Mobile v9_ultra_20250820192037</footer>
 </main>
+
+  <script src="app.js?v=v19_1756477090" defer></script>
 </body>
 </html>
